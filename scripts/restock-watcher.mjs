@@ -61,7 +61,13 @@ async function ntfy(payload) {
   for (const w of watched) {
     next[w.id] = prev[w.id];
     try {
-      const { status, body } = await req(w.yuyuUrl.trim(), { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      const { status, body } = await req(w.yuyuUrl.trim(), { headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+        'Referer': 'https://yuyu-tei.jp/',
+        'Upgrade-Insecure-Requests': '1',
+      } });
       if (status !== 200) { console.log(`  ${w.name}: HTTP ${status} - skipped`); continue; }
       const info = parseCard(body);
       const wasInStock = prev[w.id] ? prev[w.id].inStock : undefined;
