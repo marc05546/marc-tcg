@@ -1,0 +1,21 @@
+name: Restock watcher
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # every 10 minutes (UTC); GitHub may delay under load
+  workflow_dispatch:           # allow manual runs from the Actions tab
+  push:
+    branches: [main]           # run on push so we can test immediately
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run restock watcher
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: node scripts/restock-watcher.mjs
