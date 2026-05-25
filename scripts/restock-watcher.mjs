@@ -23,12 +23,15 @@ function req(url, { method = 'GET', headers = {} } = {}, body = null) {
 
 const sbHeaders = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, 'Content-Type': 'application/json' };
 async function sbGet(id) {
-  const { body } = await req(`${SUPABASE_URL}/rest/v1/card_collection?id=eq.${id}&select=cards`, { headers: sbHeaders });
-  const rows = JSON.parse(body || '[]');
-  return rows[0] ? rows[0].cards : null;
+  const { status, body } = await req(`${SUPABASE_URL}/rest/v1/card_collection?id=eq.${id}&select=cards`, { headers: sbHeaders });
+  if (status !== 200) console.log(`  ! sbGet(${id}) HTTP ${status}: ${String(body).slice(0, 160)}`);
+  let rows = [];
+  try { rows = JSON.parse(body || '[]'); } catch { console.log(`  ! sbGet(${id}) non-JSON body: ${String(body).slice(0, 160)}`); }
+  return (Array.isArray(rows) && rows[0]) ? rows[0].cards : null;
 }
 async function sbUpsert(id, cards) {
-  await req(`${SUPABASE_URL}/rest/v1/card_collection`, { method: 'POST', headers: { ...sbHeaders, Prefer: 'resolution=merge-duplicates,return=minimal' } }, JSON.stringify({ id, cards }));
+  const { status, body } = await req(`${SUPABASE_URL}/rest/v1/card_collection`, { method: 'POST', headers: { ...sbHeaders, Prefer: 'resolution=merge-duplicates,return=minimal' } }, JSON.stringify({ id, cards }));
+  console.log(`  sbUpsert(${id}) -> HTTP ${status}${status >= 300 ? ' ' + String(body).slice(0, 200) : ''}`);
 }
 
 function parseCard(html) {
@@ -53,7 +56,7 @@ async function ntfy(payload) {
   const prev = (prevRaw && typeof prevRaw === 'object' && !Array.isArray(prevRaw)) ? prevRaw : {};
   const next = {};
   const watched = wishlist.filter(w => w.yuyuUrl && w.yuyuUrl.trim());
-  console.log(`[${new Date().toISOString()}] Checking ${watched.length} watched card(s)...`);
+  console.log(`[${new Date().toISOString()}] wishlist=${wishlist.length}, watched=${watched.length}`);
 
   for (const w of watched) {
     next[w.id] = prev[w.id];
