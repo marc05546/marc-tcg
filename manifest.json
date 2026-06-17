@@ -1,0 +1,19 @@
+{
+  "name": "Marc.TCG",
+  "short_name": "Marc.TCG",
+  "description": "Marc's TCG card collection tracker",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0d18",
+  "theme_color": "#d4a843",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
